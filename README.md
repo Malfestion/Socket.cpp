@@ -68,3 +68,55 @@ if(sock->select(&reads, NULL, NULL, seconds) < 1){//Socket::select waits until s
     cout << buffer << endl;
 }
 ```
+
+**Simple UDP multithread message passing example**
+```cpp
+#include <thread>
+#include <mutex>
+#include <iostream>
+#include "Socket.h"
+
+using namespace std;
+
+string ip= "localhost";
+string port= "5001";
+mutex inputM;
+mutex outputM;
+
+void serverUDP(){
+  Socket *serverSocket= new Socket(AF_INET,SOCK_DGRAM,0);
+  serverSocket->bind(ip,port);
+  while(1){
+    string buffer;
+    serverSocket->socket_readFrom(buffer,10240,ip,port);
+    outputM.lock();
+    cout<<"El servidor Recibio:"<<buffer<<endl;
+    outputM.unlock();
+  }
+}
+void clientUDP(int id){
+  string userIn;
+  Socket *clientSocket= new Socket(AF_INET,SOCK_DGRAM,0);
+  while(1){
+    inputM.lock();
+    getline(cin,userIn);
+    inputM.unlock();
+    clientSocket->socket_writeTo(userIn,ip,port);
+    outputM.lock();
+    cout<<"se envio el mensaje:\""<<userIn<<"\" Sender=cliente "<<id<<endl;
+    outputM.unlock();
+  }
+}
+int main(){
+thread t1(serverUDP);//se crea un hilo y se envia a serverUDP() con sus parametros
+thread t2(clientUDP,1);//se crea un hilo y se envia a clientUDP() con sus parametros
+thread t3(clientUDP,2);//se crea un hilo y se envia a clientUDP() con sus parametros
+t1.join();//se espera a que los hilos terminen
+t2.join();//se espera a que los hilos terminen
+//t3.join();//se espera a que los hilos terminen
+return 0;
+
+  printf("1\n");
+  return 0;
+}
+```
