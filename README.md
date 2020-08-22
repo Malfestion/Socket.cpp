@@ -113,7 +113,7 @@ thread t2(clientUDP,1);//se crea un hilo y se envia a clientUDP() con sus parame
 thread t3(clientUDP,2);//se crea un hilo y se envia a clientUDP() con sus parametros
 t1.join();//se espera a que los hilos terminen
 t2.join();//se espera a que los hilos terminen
-//t3.join();//se espera a que los hilos terminen
+t3.join();//se espera a que los hilos terminen
 return 0;
 
   printf("1\n");
